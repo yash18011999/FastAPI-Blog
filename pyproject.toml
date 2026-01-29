@@ -1,0 +1,11 @@
+[project]
+name = "fastapi-blog"
+version = "0.1.0"
+description = "First FastAPI project"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiosqlite>=0.22.1",
+    "fastapi[standard]>=0.128.0",
+    "sqlalchemy>=2.0.46",
+]
