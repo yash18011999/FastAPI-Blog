@@ -45,14 +45,14 @@ app.include_router(posts.router, prefix="/api/posts", tags=["posts"])
 @app.get("/", include_in_schema=False, name="home")
 @app.get("/posts", name="posts")
 async def home(request: Request, db: Annotated[AsyncSession, Depends(get_db)]):
-    result = await db.execute(select(models.Post).options(selectinload(models.Post.author)))
+    result = await db.execute(select(models.Post).options(selectinload(models.Post.author)).order_by(models.Post.date_posted.desc()))
     posts = result.scalars().all()
     # return {"message": "Hello World"}
     # return f"<h1>{posts[0]['title']}</h1>"
     return templates.TemplateResponse(request, "home.html", {"posts": posts, "title": "Home"})
 
 
-@app.get("/posts/{post_id}", include_in_schema=False, name="get_post")
+@app.get("/posts/{post_id}", include_in_schema=False)
 async def post_page(post_id: int, request: Request, db: Annotated[AsyncSession, Depends(get_db)]):
     result = await db.execute(
         select(models.Post)
@@ -80,7 +80,8 @@ async def user_posts_page(request: Request, user_id: int, db: Annotated[AsyncSes
     result = await db.execute(
         select(models.Post)
         .options(selectinload(models.Post.author))
-        .where(models.Post.user_id == user_id))
+        .where(models.Post.user_id == user_id)
+        .order_by(models.Post.date_posted.desc()))
     posts = result.scalars().all()
     return templates.TemplateResponse(
         request,
